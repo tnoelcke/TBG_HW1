@@ -11,13 +11,19 @@ class fileObj:
         self.filePtr = ptr
         self.minIdx = minIdx
         self.maxIdx = maxIdx
+        self.lastStoredMiddleIdx = 0
     def getVal(self,idx):
         nuIdx = self.minIdx + (idx * 4) #in case of pass by ref.
         return (int(hexlify(self.filePtr[nuIdx:nuIdx+4]),16))
+    def getValAtStoredMid(self):
+        nuMid = self.lastStoredMiddleIdx
+        return (int(hexlify(self.filePtr[nuMid:nuMid+4]),16))
     def len(self):
         return (self.maxIdx - self.minIdx)
     def closeFile(self):
         self.filePtr.close()
+    def compare(self,x):
+        return (self.filePtr == x.filePtr)
 
 # desc: Helper for opening binary files
 def openBinaryfile(fStr):
@@ -29,17 +35,25 @@ def openBinaryfile(fStr):
 
 
 #reference http://www.geeksforgeeks.org/k-th-element-two-sorted-arrays/
+
+#for M == 2
 def findKthItem(A, B, k):
     while True:
+        #BaseCases
         if A.len() == 0 or B.len() == 1:
             return B.getVal(k)
         if B.len() == 0 or A.len() == 1:
             return A.getVal(k)
+        #end BaseCases
 
+        #mids
         mid1 = max(math.floor(A.len() / 2),0)
         mid2 = max(math.floor(B.len() / 2),0)
+        #end mids
 
+        #sum indexes
         if (mid1 + mid2) < k:
+            #resize file ranges
             if A.getVal(mid1) > B.getVal(mid2):
                 B.minIdx += mid2+1 #or max
                 k = max(k - mid2 -1,0)
@@ -47,10 +61,74 @@ def findKthItem(A, B, k):
                 A.minIdx += mid1+1 #or max
                 k = max(k - mid1 -1,0)
         else:
+            #resize file ranges
             if A.getVal(mid1) > B.getVal(mid2):
                 A.maxIdx -= mid1
             else:
                 B.maxIdx -= mid2
+
+def findLargest(superList):
+    largest = superList[0]
+    for subList in superList:
+        if subList.len() > largest.len():
+            largest = copy.copy(subList)
+
+    return largest
+
+#modeled after findKthItem
+def findKthForMFiles(superList,kth):
+    adjKth = kth -1
+
+    while True:
+        #BaseCase
+        count = 0
+        largeList = findLargest(superList)
+        for subList in superList:#replace with lambda
+            if subList.len() == 1 or subList.len() == 0:
+                count += 1
+        if count == len(superList) -1:
+            return largeList.getVal(adjKth)#look over this again
+        #end BaseCase
+
+        #assign new mid indexes
+        for subList in superList:#replace with lambda
+            subList.lastStoredMiddleIdx = max(math.floor(subList.len() / 2),0)
+        #end assign new mid indexes
+
+        #find sum Indexes
+        sumIndexes = 0
+        for subList in superList:#replace with lambda
+            sumIndexes += subList.len()
+        #end find sum indexes
+
+        if sumIndexes < adjKth:
+            for subList in superList:#replace with lambda
+                #resize file ranges
+                if largeList.getValAtStoredMid() > subList.getValAtStoredMid():
+                    subList.minIdx += subList.lastStoredMiddleIdx + 1
+                    adjKth = max(adjKth - subList.lastStoredMiddleIdx - 1,0)
+                else:
+                    #resize largest file
+                    oldLargest = filter(lambda l: l.compare(largeList),superList)
+                    largeList = copy.copy(subList)
+                    oldLargest.minIdx += oldLargest.lastStoredMiddleIdx + 1
+                    adjKth = max(adjKth - oldLargest.lastStoredMiddleIdx - 1,0)
+        else:
+            for subList in superList:#replace with lambda
+                #resize file ranges
+                if largeList.getValAtStoredMid() > subList.getValAtStoredMid():
+                    subList.maxIdx -= subList.lastStoredMiddleIdx
+                else:
+                    #resize largest file
+                    oldLargest = filter(lambda l: l.compare(largeList),superList)
+                    largeList = copy.copy(subList)
+                    oldLargest.maxIdx -= oldLargest.lastStoredMiddleIdx
+                    adjKth = max(adjKth - oldLargest.lastStoredMiddleIdx,0)
+
+
+
+
+            
 
 def findKthForArrayLoop(superList, kth):
     
