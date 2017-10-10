@@ -16,7 +16,7 @@ class fileObj:
         nuIdx = self.minIdx + (idx * 4) #in case of pass by ref.
         return (int(hexlify(self.filePtr[nuIdx:nuIdx+4]),16))
     def getValAtStoredMid(self):
-        nuMid = self.lastStoredMiddleIdx
+        nuMid = self.minIdx + (self.lastStoredMiddleIdx * 4)
         return (int(hexlify(self.filePtr[nuMid:nuMid+4]),16))
     def len(self):
         return (self.maxIdx - self.minIdx)
@@ -71,15 +71,26 @@ def findLargest(superList):
     largest = superList[0]
     for subList in superList:
         if subList.len() > largest.len():
-            largest = copy.copy(subList)
+            largest = subList
 
     return largest
 
 #modeled after findKthItem
 def findKthForMFiles(superList,kth):
-    adjKth = kth -1
+    adjKth = kth
 
     while True:
+        #find sum Indexes
+        sumIndexes = 0
+        for subList in superList:#replace with lambda
+            sumIndexes += subList.len()
+        #end find sum indexes
+
+        #assign new mid indexes
+        for subList in superList:#replace with lambda
+            subList.lastStoredMiddleIdx = max(math.floor(subList.len() / 2),0)
+        #end assign new mid indexes
+
         #BaseCase
         count = 0
         largeList = findLargest(superList)
@@ -87,43 +98,56 @@ def findKthForMFiles(superList,kth):
             if subList.len() == 1 or subList.len() == 0:
                 count += 1
         if count == len(superList) -1:
+            print("count equals superlist")
+            print(adjKth)
             return largeList.getVal(adjKth)#look over this again
+
+        if sumIndexes == adjKth:
+            print("equals adjkth")
+            return largeList.getVal(adjKth)
         #end BaseCase
 
-        #assign new mid indexes
-        for subList in superList:#replace with lambda
-            subList.lastStoredMiddleIdx = max(math.floor(subList.len() / 2),0)
-        #end assign new mid indexes
 
-        #find sum Indexes
-        sumIndexes = 0
-        for subList in superList:#replace with lambda
-            sumIndexes += subList.len()
-        #end find sum indexes
-
+        print(sumIndexes)
         if sumIndexes < adjKth:
             for subList in superList:#replace with lambda
-                #resize file ranges
-                if largeList.getValAtStoredMid() > subList.getValAtStoredMid():
-                    subList.minIdx += subList.lastStoredMiddleIdx + 1
-                    adjKth = max(adjKth - subList.lastStoredMiddleIdx - 1,0)
-                else:
-                    #resize largest file
-                    oldLargest = filter(lambda l: l.compare(largeList),superList)
-                    largeList = copy.copy(subList)
-                    oldLargest.minIdx += oldLargest.lastStoredMiddleIdx + 1
-                    adjKth = max(adjKth - oldLargest.lastStoredMiddleIdx - 1,0)
+                if not subList.compare(largeList):
+                    #resize file ranges
+                    if largeList.getValAtStoredMid() > subList.getValAtStoredMid():
+                        print("1")
+                        subList.minIdx += subList.lastStoredMiddleIdx + 1
+                        adjKth = max(adjKth - subList.lastStoredMiddleIdx - 1,0)
+                    else:
+                        #resize largest file
+                        print("2")
+                        oldLargest = None
+                        for subList in superList:#replace with lambda
+                            if subList.compare(largeList):
+                                oldLargest = subList
+                        largeList = subList
+                        oldLargest.minIdx += oldLargest.lastStoredMiddleIdx + 1
+                        adjKth = max(adjKth - oldLargest.lastStoredMiddleIdx - 1,0)
+                        
         else:
             for subList in superList:#replace with lambda
-                #resize file ranges
-                if largeList.getValAtStoredMid() > subList.getValAtStoredMid():
-                    subList.maxIdx -= subList.lastStoredMiddleIdx
-                else:
-                    #resize largest file
-                    oldLargest = filter(lambda l: l.compare(largeList),superList)
-                    largeList = copy.copy(subList)
-                    oldLargest.maxIdx -= oldLargest.lastStoredMiddleIdx
-                    adjKth = max(adjKth - oldLargest.lastStoredMiddleIdx,0)
+                if not subList.compare(largeList):
+                    print("l:",largeList.getValAtStoredMid())
+                    print("s:",subList.getValAtStoredMid())
+
+                    #resize file ranges
+                    if largeList.getValAtStoredMid() > subList.getValAtStoredMid():
+                        print("3")
+                        subList.maxIdx -= subList.lastStoredMiddleIdx
+                    else:
+                        print("4")
+                        #resize largest file
+                        oldLargest = None
+                        for subList in superList:#replace with lambda
+                            if subList.compare(largeList):
+                                oldLargest = subList
+                        largeList = subList
+                        oldLargest.maxIdx -= oldLargest.lastStoredMiddleIdx
+
 
 
 
@@ -140,22 +164,7 @@ def findKthForArrayLoop(superList, kth):
     elif len(superList) == 2:#O(log n)
         return findKthItem(superList[0], superList[1], kth-1)
     else:
-
-        currVal = 9999999999999999999
-
-        for L1 in superList:
-            for L2 in superList:
-                if not L1 == L2:
-                    deepCopyL1 = copy.copy(L1)
-                    deepCopyL2 = copy.copy(L2)
-
-                    currVal = min(findKthItem(deepCopyL1,deepCopyL2,adjKth -1),currVal)
-
-                    print(findKthItem(deepCopyL1,deepCopyL2,adjKth -1))
-
-        print("currVal:",currVal)
-
-        return currVal
+        return findKthForMFiles(superList,kth)
 
 
 
