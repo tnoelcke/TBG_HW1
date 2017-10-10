@@ -2,43 +2,43 @@ import math
 
 # reference: https://codesays.com/2014/solution-to-median-of-two-sorted-arrays-by-leetcode/
 
-def findKthItem(A, B, k):
+def findKth(arrA, arrB, k):
 
-            if len(A) > len(B):
-                A, B = B, A
-            # stepsA = (endIndex + beginIndex_as_0) / 2
-            stepsA = int((min(len(A), k) -1)/ 2)
-            # stepsB =  k - (stepsA + 1) -1 for the 0-based index
-            stepsB = int(k - stepsA - 2)
+            if len(arrA) > len(arrB):
+                arrA, arrB = arrB, arrA
+            # indexA = (endIndex + beginIndex_as_0) / 2
+            indexA = int((min(len(arrA), k) -1) / 2)
+            # indexB =  k - (indexA + 1) -1 for the 0-based index
+            indexB = int(k - indexA - 2)
  
-            # Only array B contains elements
-            if len(A) == 0:
-                return B[k-1]
-            # Both A and B contain elements, and we need the smallest one
+            # Only array arrB contains elements
+            if len(arrA) == 0:
+                return arrB[k - 1]
+            # Both arrA and arrB contain elements, and we need the smallest one
             elif k == 1:
-                return min(A[0], B[0])
-            # The median would be either A[stepsA] or B[stepsB], while A[stepsA] and
-            # B[stepsB] have the same value.
-            elif A[stepsA] == B[stepsB]:
-                return A[stepsA]
-            # The median must be in the right part of B or left part of A
-            elif A[stepsA] > B[stepsB]:
-                return findKthItem(A, B[stepsB+1:], k-stepsB-1)
-            # The median must be in the right part of A or left part of B
+                return min(arrA[0], arrB[0])
+            # The median would be either arrA[indexA] or arrB[indexB], while arrA[indexA] and
+            # arrB[indexB] have the same value.
+            elif arrA[indexA] == arrB[indexB]:
+                return arrA[indexA]
+            # The median must be in the right part of arrB or left part of arrA
+            elif arrA[indexA] > arrB[indexB]:
+                return findKth(arrA, arrB[indexB + 1:], k - indexB - 1)
+            # The median must be in the right part of arrA or left part of arrB
             else:
-                return findKthItem(A[stepsA+1:], B, k-stepsA-1)
+                return findKth(arrA[indexA + 1:], arrB, k - indexA - 1)
  
         # There must be at least one element in these two arrays
-            assert not(len(A) == 0 and len(B) == 0)
+            assert not(len(arrA) == 0 and len(arrB) == 0)
  
-            if (len(A)+len(B))%2==1:
+            if (len(arrA)+len(arrB))%2==1:
             # There are odd number of elements in total. The median the one in the middle
-                return findKthItem(A, B, (len(A)+len(B))/2+1) * 1.0
+                return findKth(arrA, arrB, (len(arrA)+len(arrB)) / 2 + 1) * 1.0
             else:
             # There are even number of elements in total. The median the mean value of the
             # middle two elements.
-                return ( findKthItem(A, B, (len(A)+len(B))/2+1) +
-                     findKthItem(A, B, (len(A)+len(B))/2) ) / 2.0
+                return ( findKth(arrA, arrB, (len(arrA) + len(arrB)) / 2 + 1) +
+                     findKth(arrA, arrB, (len(arrA) + len(arrB))/2) ) / 2.0
 
 alist = [1, 4, 7, 10, 13]
 blist = [2, 5, 8, 11, 14]
@@ -82,9 +82,9 @@ def findKthForArrayLoop(superlist, kth):
         print("list of elemnts" ,listOfKthElements)
         # check if midpoint is 1 (aka array size is 2) 
         if(adjKth ==1):
-            print("Kth elemnt if k> length:",findKthItem(listOfKthElements,a,kth))
+            print("Kth elemnt if k> length:",findKth(listOfKthElements,a,kth))
         else:
-            print("Kth elemnt if k> length:",findKthItem(listOfKthElements,a,kth % len(superlist[0])+1))
+            print("Kth elemnt if k> length:",findKth(listOfKthElements,a,kth % len(superlist[0])+1))
 
    # if kth is less than the size of the array
    # adjust midpoint to be the cieling rather than floor of kth / array size
@@ -102,7 +102,7 @@ def findKthForArrayLoop(superlist, kth):
         print(listOfKthElements)
         listOfKthElements.sort()
         print("list of elemnts",listOfKthElements)
-        print("Kth element if k<len",findKthItem(listOfKthElements, a, kth))
+        print("Kth element if k<len",findKth(listOfKthElements, a, kth))
 
 
 #findKthForArray(superlist1,5)
