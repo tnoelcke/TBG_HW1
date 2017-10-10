@@ -143,5 +143,5 @@ for i in range(1,numFiles+1):
 
 kthValue = findKthForArrayLoop(superList, posElement)
 outFile = open("output.txt","w+")
-outFile.write(str(kthValue)))
+outFile.write(str(kthValue))
 outFile.close()
