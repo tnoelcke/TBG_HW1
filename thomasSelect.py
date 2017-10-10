@@ -115,7 +115,7 @@ def findKth(superlist, k, bottom, top):
 	print(largest, length, middleIndex, middle)
 	temp = 0
 	for i in range(0, len(superlist)):
-		temp = binarySearchI(superlist[i], middle, 0, superlist[i].len() - 1)
+		temp = binarySearchI(superlist[i], middle, bottom[i], top[i] - 1)
 		if temp > 0:
 			middleAr.append(temp)
 		else:
@@ -152,6 +152,7 @@ for i in range(1,numFiles+1):
 	top.append(numCols)
 
 kthValue = findKth(superList, posElement, bottom, top)
+print("kth: ", kthValue)
 outFile = open("output.txt","w+")
 outFile.write(str(kthValue))
 outFile.close()
