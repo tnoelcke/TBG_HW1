@@ -141,4 +141,7 @@ for i in range(1,numFiles+1):
     filePtr = openBinaryfile(str(i))
     superList.append(fileObj(filePtr,0,numCols))
 
-findKthForArrayLoop(superList, posElement)
+kthValue = findKthForArrayLoop(superList, posElement)
+outFile = open("output.txt","w+")
+outFile.write(str(kthValue)))
+outFile.close()
