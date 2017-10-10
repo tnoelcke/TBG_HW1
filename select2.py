@@ -79,6 +79,10 @@ def findLargest(superList):
 def findKthForMFiles(superList,kth):
     adjKth = kth
 
+    for subList in superList:#replace with lambda
+        subList.maxIdx = adjKth
+
+
     while True:
         #find sum Indexes
         sumIndexes = 0
