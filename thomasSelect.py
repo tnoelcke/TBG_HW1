@@ -63,14 +63,15 @@ def arrayAdd(array1, array2):
 	for i in range(0, len(array1)):
 		array1[i] = array1[i] + (array2[i] - array1[i])
 
-#returns the index of value or the nearest element less than value
+#returns the index of value or such that the index is the next lowest
+#item in the array.
 def binarySearchI(toSearch, value, low, high):
-	#sets the first position to check
-	#damn you python that doesn't do integer trucation automatically like c...
+	#If the value is less than the lowest element return.
 	if value < toSearch.getVal(low):
 		return low
+	#sets the first position to check
 	pos = int(math.ceil((high - low) / 2)) + low
-	#if we found our value stop and return because we are done
+	#if we found our value stop and return because we are done.
 	if value == toSearch.getVal(pos):
 	  return pos + 1
 	#if we get down to one item and its smaller than value return pos.
@@ -80,77 +81,86 @@ def binarySearchI(toSearch, value, low, high):
 	#one index lower because we know it will be less than value.
 	if high - low <= 1 and value < toSearch.getVal(pos):
 	  return pos
+	#Takes recursive step
 	if value < toSearch.getVal(pos):
-	  return binarySearchI(toSearch, value, low, pos - 1)	
+	  return binarySearchI(toSearch, value, low, pos - 1)
 	else:
 	  return binarySearchI(toSearch, value, pos + 1, high)
 		
 def findKth(superlist, k, bottom, top):
-	#if you have only one array.
+	#if you have only one array chose k and return.
 	if len(superlist) == 1:
 		return superlist[0].getVal(k - 1)
-  #if there is only one element left per array then stop and fink k.
-	if k == 1:
+  #if k is the smallest remaining element in the array
+	if (k - arraySum(bottom))  == 1:
 		min = superlist[0].getVal(len(superlist[0]) - 1)
+		#find the smallest element and return.
 		for i in range(0, len(superlist)):
 			if top[i] - bottom[i] and superlist[i].getVal(bottom[i]) < min:
 				min = superlist[i].getVal(bottom[i])
-				print(min)
 		return min
+	#if each column only has one element remaining find the kth element in the columns 
 	if onlyOneElm(bottom, top):
 		results = []
+		#Loop through and grab the remaining elements
 		for i in range(0, len(superlist)):
+			#make sure that i is still a valid element
 			if top[i] - bottom [i] >= 0:
 				results.append(superlist[i].getVal(bottom[i]))
+		#sort the list and return the kth element
 		results.sort()
-		print(k, results, bottom, top)
 		return results[k - arraySum(bottom) - 1]
-  
+	
 	#Find largest Array and choose the middle index
 	largest = chooseLargestList(bottom, top)
 	length = top[largest] - bottom[largest]-1
 	middleIndex = int(length/2) + bottom[largest]
 	middle = superlist[largest].getVal(middleIndex)
 	middleAr = []
-	print(largest, length, middleIndex, middle)
 	temp = 0
+	#loop through the list of lists and find the index where middle = listValue
+	#or the value of the index of the nearest lower element
 	for i in range(0, len(superlist)):
-		temp = binarySearchI(superlist[i], middle, bottom[i], top[i] - 1)
+		temp = binarySearchI(superlist[i], middle, bottom[i], top[i] - 1) 
 		if temp > 0:
 			middleAr.append(temp)
 		else:
 			middleAr.append(0)
 	index = arraySum(middleAr)
+	#if the sum of our middle indexs == k you found the kth element and return
 	if index == k:
-		print(index, k, largest, middle, middleAr, bottom, top)
 		return middle
+	#if index is greater than k take the the lower side of the lists
 	if index > k:
-		print(k, index, middleAr,bottom, top, middle)
-		arraySub(top, middleAr)
+		arraySub(top, middleAr) #eliminates higher elements
 		return findKth(superlist, k, bottom, top)
+	#if index is greater than k tkae the high side of the lists
 	if index < k:
-		print(k, index, middleAr,bottom, top, middle)
-		arrayAdd(bottom, middleAr)
-		return findKth(superlist, k , bottom, top)	
+		arrayAdd(bottom, middleAr) #Eliminates lower elements.
+		return findKth(superlist, k , bottom, top)
 	
 
+#Get the input from the text file
 inputFile = open("input.txt","r")
 inputStr = (inputFile.readline().split(','))
 
+#parse input
 numFiles = int(inputStr[0])
 numCols = int(inputStr[1])
 posElement = int(inputStr[2])
 
-top = []
-bottom = []
-superList = []
+#set up for call to kth element.
+top = [] # tracks the higher array indexes
+bottom = [] #tracks the lower array indexes
+superList = [] #Holds the file pointers
+#load up the file pointers into our array
 for i in range(1,numFiles+1):
-	print(i)
 	filePtr = openBinaryfile(str(i))
 	superList.append(fileObj(filePtr,0,numCols))
 	bottom.append(0)
 	top.append(numCols)
 
+#get the kth value and output it.
 kthValue = findKth(superList, posElement, bottom, top)
 print("kth: ", kthValue)
 outFile = open("output.txt","w+")
