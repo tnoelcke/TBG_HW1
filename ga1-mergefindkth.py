@@ -62,7 +62,7 @@ def findKthForArrayLoop(superlist, kth):
     a = []
     # adjKth is the midpoint of an array m of size n
     adjKth = math.floor( kth / len(superlist) )
-    
+    kthElement = 0
     KthElementsForPair = []
     print("adjkth:",adjKth)
 
@@ -82,9 +82,11 @@ def findKthForArrayLoop(superlist, kth):
         print("list of elemnts" ,listOfKthElements)
         # check if midpoint is 1 (aka array size is 2) 
         if(adjKth ==1):
-            print("Kth elemnt if k> length:",findKth(listOfKthElements,a,kth))
+            kthElement = findKth(listOfKthElements,a,kth)
+            print("Kth elemnt if k> length:",kthElement)
         else:
-            print("Kth elemnt if k> length:",findKth(listOfKthElements,a,kth % len(superlist[0])+1))
+            kthElement = findKth(listOfKthElements,a,kth % len(superlist[0])+1)
+            print("Kth elemnt if k> length:",kthElement)
 
    # if kth is less than the size of the array
    # adjust midpoint to be the cieling rather than floor of kth / array size
@@ -102,8 +104,11 @@ def findKthForArrayLoop(superlist, kth):
         print(listOfKthElements)
         listOfKthElements.sort()
         print("list of elemnts",listOfKthElements)
-        print("Kth element if k<len",findKth(listOfKthElements, a, kth))
-
+        kthElement = findKth(listOfKthElements, a, kth)
+        print("Kth element if k<len",kthElement)
+        
+    # return kth
+    return kthElement
 
 #findKthForArray(superlist1,5)
 findKthForArrayLoop(superlist1, 4)
