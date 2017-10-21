@@ -7,7 +7,7 @@ def findKth(arrA, arrB, k):
             if len(arrA) > len(arrB):
                 arrA, arrB = arrB, arrA
             # indexA = (endIndex + beginIndex_as_0) / 2
-            indexA = int((min(len(arrA), k) -1) / 2)
+            indexA = float(min(len(arrA), k) -1) / 2)
             # indexB =  k - (indexA + 1) -1 for the 0-based index
             indexB = int(k - indexA - 2)
  
@@ -113,4 +113,4 @@ def findKthForArrayLoop(superlist, kth):
 #findKthForArray(superlist1,5)
 findKthForArrayLoop(superlist1, 4)
 findKthForArrayLoop(superlist1,14)
-findKthForArrayLoop(superlist2, 3)
+findKthForArrayLoop(superlist2, 3))
