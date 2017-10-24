@@ -93,7 +93,7 @@ def findKth(superlist, k, minBound, maxBound):
 		return superlist[0].getVal(k - 1)
   #if k is the smallest remaining element in the array
 	if (k - arraySum(minBound))  == 1:
-		min = superlist[0].getVal(len(superlist[0]) - 1)
+		min = superlist[0].getVal(superlist[0].len() - 1)
 		#find the smallest element and return.
 		for i in range(0, len(superlist)):
 			if maxBound[i] - minBound[i] and superlist[i].getVal(minBound[i]) < min:
